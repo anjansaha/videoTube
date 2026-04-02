@@ -89,7 +89,6 @@ const loginUser = async (req, res) => {
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-  console.log("user found", user);
 
   const isPasswordCorrect = await user.isPasswordCorrect(password);
   if (!isPasswordCorrect) {
@@ -263,6 +262,46 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
         new ApiResponse(200, channel[0], "User channel fetched successfully")
     )
 })
+
+const getUserProfile = asyncHandler(async (req, res) => {
+    const user = req.user;
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, user, "User profile fetched successfully")
+        );
+});
+
+const getAllChannels = asyncHandler(async (req, res) => {
+  const user = req.user;
+    const channels = await User.aggregate([
+      {
+        $match: {
+          _id: { $ne: user._id }
+        }
+      },
+      {
+        $project:{
+          fullName: 1,
+          username: 1,
+          avatar: 1,
+          coverImage: 1
+        }
+      }
+    ])
+
+    if (!channels?.length) {
+      throw new ApiError(404, "No channels found");
+    }
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, channels, "Channels fetched successfully")
+      );
+});
 export {
   registerUser,
   loginUser,
@@ -271,5 +310,7 @@ export {
   decodeToken,
   refreshToken,
   changePassword,
-  getUserChannelProfile
+  getUserChannelProfile,
+  getUserProfile,
+  getAllChannels
 };

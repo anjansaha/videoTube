@@ -1,9 +1,9 @@
-import { User } from "../models/user.model";
-import { ApiError } from "../utils/apiError";
-import { asyncHandler } from "../utils/asyncHandler";
-import { decodeToken } from "../utils/auth";
+import { User } from "../models/user.model.js";
+import { ApiError } from "../utils/apiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { decodeToken } from "../utils/auth.js";
 
-const verifyAuthentication = asyncHandler((req, _, next) => {
+const verifyAuthentication = asyncHandler(async (req, _, next) => {
   try {
     const token =
       req.cookies?.accessToken ||
@@ -12,10 +12,12 @@ const verifyAuthentication = asyncHandler((req, _, next) => {
       throw new ApiError(401, "Unauthorized request");
     }
     const decoded = decodeToken(token, process.env.ACCESS_TOKEN_SECRET);
-    const user = User.findById(decoded?._id).select(
-      "-password",
-      "-refreshToken"
-    );
+
+    const user = await User.findById(decoded?._id).select({
+      password: 0,
+      refreshToken: 0,
+    });
+
     if (!user) {
       throw new ApiError(401, "Invalid Access Token");
     }
@@ -26,6 +28,4 @@ const verifyAuthentication = asyncHandler((req, _, next) => {
   }
 });
 
-export{
-    verifyAuthentication
-}
+export { verifyAuthentication };

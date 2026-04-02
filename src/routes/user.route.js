@@ -2,7 +2,9 @@ import { Router } from "express";
 import upload from "../middlewares/multer.middleware.js";
 import {
   changePassword,
+  getAllChannels,
   getUserChannelProfile,
+  getUserProfile,
   loginUser,
   logoutUser,
   refreshToken,
@@ -32,5 +34,7 @@ router.use(verifyAuthentication);
 router.route("/logout").post(logoutUser);
 router.route("/update-password").post(changePassword);
 router.route("/profile/:username").get(getUserChannelProfile);
+router.route("/profile").get(getUserProfile);
+router.route("/channels").get(getAllChannels);
 
 export default router;

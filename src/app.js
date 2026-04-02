@@ -21,7 +21,7 @@ import subcriptionRouter from "./routes/subcription.route.js";
 
 //use routes
 app.use("/api/v1/user", userRouter)
-app.use("api/v1/subcription", subcriptionRouter)
+app.use("/api/v1/subscribe", subcriptionRouter)
 
 
 export { app };

@@ -1,5 +1,5 @@
 import  jwt from "jsonwebtoken";
-import { ApiError } from "./apiError";
+import { ApiError } from "./apiError.js";
 
 const decodeToken = (token, secret) => {
   try {
