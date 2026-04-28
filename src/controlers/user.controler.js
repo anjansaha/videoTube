@@ -118,9 +118,7 @@ const loginUser = async (req, res) => {
     );
 };
 
-const logoutUser = async (req, res) => {
-  console.log('req', req);
-  
+const logoutUser = async (req, res) => {  
   const accessToken =
     req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
   console.log(req.headers.authorization?.split(" ")[1]);
@@ -174,11 +172,11 @@ const refreshToken = asyncHandler(async (req, res) => {
 
 const changePassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
-  const user = req.user;
+  const user = await User.findById(req.user._id).select("-accessToken -refreshToken");
   if (!user) {
     throw new ApiError(404, "User not found");
-  }
-  const isPasswordCorrect = user.isPasswordCorrect(oldPassword)
+  }  
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
   if(!isPasswordCorrect){
     throw new ApiError(401,"Invalid credentials")
   }

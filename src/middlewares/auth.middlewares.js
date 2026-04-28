@@ -11,17 +11,21 @@ const verifyAuthentication = asyncHandler(async (req, _, next) => {
     if (!token) {
       throw new ApiError(401, "Unauthorized request");
     }
-    const decoded = decodeToken(token, process.env.ACCESS_TOKEN_SECRET);
+    const decoded = decodeToken(token, process.env.ACCESS_TOKEN_SECRET);    
 
-    const user = await User.findById(decoded?._id).select({
-      password: 0,
-      refreshToken: 0,
-    });
-
+    const user = await User.findById(decoded?._id);
     if (!user) {
       throw new ApiError(401, "Invalid Access Token");
     }
-    req.user = user;
+    if (!user.refreshToken) {
+      throw new ApiError(401, "Invalid refresh token");
+    }
+    const userObj = user.toObject();
+    delete userObj.password;
+    delete userObj.refreshToken;
+        console.log('userObj', userObj);
+
+    req.user = userObj;
     next();
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid access token");
